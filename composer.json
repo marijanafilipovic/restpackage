@@ -1,0 +1,25 @@
+{
+    "name": "marijana/restpackage",
+    "description": "demo consume rest api end points",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Marijana\\Restpackage\\": "src/"
+        }
+    },
+    "require": {
+        "php": "^7.3|^8.0",
+        "laravel/framework": "^8.65"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^6.0",
+        "guzzlehttp/guzzle": "^7.0.1"
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+            "Marijana\\Restpackage\\BaseApiPackageServiceProvider"
+            ]
+        }
+    }
+}
