@@ -11,7 +11,7 @@ za preuzimanje preko composer-a
     },
 ==================================
 2. composer require marijana/restpackage
-3. run php artisan vendor:publish
+
 
 CONFIG
 endpoints se nalaze u config/endpoint.php
