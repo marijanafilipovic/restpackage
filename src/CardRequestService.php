@@ -8,29 +8,21 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\RequestException;
 
-class CardRequestService implements IRequestService
+class CardRequestService extends validateRequest implements IRequestService
 {
+    protected $modelName = 'card';
     protected $client;
-    public function makeRequest($method, $endpointName=null, $param=null)
+    protected $url;
+    public function validateRequest($modelName, $method, $endpointName, $param=null)
     {
-        //check endpoint from confing by endpointName and create endpointUrl
+        $requestCheck = new validateRequest();
+       return $this->url = $requestCheck->validate($modelName, $method, $endpointName, $param);
+    }
 
-        if($endpointName == ''){
-            $url='https://countriesnow.space/api/v0.1/countries';
-        }else{
-            $endUrl = config('endpoints.'.$endpointName);
-          //  dd($endUrl);
-
-           // $param = 150;
-            if(strpos($endUrl, ':id') !==false && (!empty($param))){
-                $endUrl = str_replace(':id', $param,$endUrl);
-            }
-            $baseURL = env('APP_URL');
-            $url = $baseURL.$endUrl;
-            //dd($url);
-        }
+    public function makeRequest($method, $url, $param=null)
+    {
         //check response
-
+        try{
                 $client = new Client();
                 $api_key = config('auth_app.AUTH-KEY');
                 // dd($api_key);
@@ -38,7 +30,7 @@ class CardRequestService implements IRequestService
                     'AUTH-KEY' => $api_key
                 ];
                 //$params = [];
-        try{      $response = $client->request($method, $url, [
+             $response = $client->request($method, $url, [
                     //'json' => $params,
                     'headers' => $headers,
                     'verify'=>false,
@@ -47,7 +39,7 @@ class CardRequestService implements IRequestService
                 return compact('responseBody');
             }catch(ClientException $ex){
            // return $responseBody = $ex->getResponse()->getBody(true);
-               // return "TRY block did not response ";
+                 return "TRY block did not make response ";
             }
         }
 

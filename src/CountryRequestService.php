@@ -10,37 +10,47 @@ use GuzzleHttp\Exception\RequestException;
 use phpDocumentor\Reflection\Types\Null_;
 
 
-class CountryRequestService implements IRequestService
+class CountryRequestService extends validateRequest implements IRequestService
 {
 protected $client;
-public function makeRequest($method, $endpointName, $param)
-{
-    //check endpoint from confing by endpointName and create endpointUrl
+protected $api_key;
+protected $method;
+protected $url;
+protected $param;
+protected $modelName = 'country';
+//check endpoint from confing by endpointName and create endpointUrl
 
-    if($endpointName == ''){
-        $url='https://restcountries.com/v2/all';
-    }else{
-        $endUrl = config('endpoints.'.$endpointName);
-        //  dd($endUrl);
-
-        // $param = 150;
-        if(strpos($endUrl, ':id') !==false && (!empty($param))){
-            $endUrl = str_replace(':id', $param,$endUrl);
-        }
-        $baseURL = env('APP_URL');
-        $url = $baseURL.$endUrl;
-        //dd($url);
+    /**
+     * @param $modelName
+     * @param $method
+     * @param $endpointName
+     * @param null $param
+     * @return string
+     */
+    public function validateRequest($modelName, $method, $endpointName, $param=null)
+    {
+        $requestCheck = new validateRequest();
+        return $this->url = $requestCheck->validate($modelName, $method, $endpointName, $param);
     }
-    //check response
-    try{
+
+    /**
+     * @param $method
+     * @param $url
+     * @param null $param
+     * @return array|string
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public function makeRequest($method, $url, $param=null)
+    {
+     //check response
+
         $client = new Client();
         $api_key = config('auth_app.AUTH-KEY');
-        // dd($api_key);
         $headers = [
             'AUTH-KEY' => $api_key
         ];
         //$params = [];
-        $response = $client->request($method, $url, [
+        $response = $client->request($method, $this->url, [
             //'json' => $params,
             'headers' => $headers,
             'verify'=>false,
@@ -48,11 +58,18 @@ public function makeRequest($method, $endpointName, $param)
         if(!$response){
             return "Bad request response.";
         }
+        try{
         $responseBody = json_decode($response->getBody());
-        return compact('responseBody');
-    }catch(ClientException $ex){
-        dd($ex->getMessage());
-    }
+        $response->getStatusCode();
+
+
+               return compact('responseBody');
+           }catch(ClientException $e){
+        return $response->getStatusCode();
+            //  redirect('/');
+
+        }
+
 }
 
 }
