@@ -3,6 +3,14 @@ INSTALL
 za preuzimanje preko composer-a
 1. u composer.json aplikacije dodati
 ==================================
+"repositories": {
+    "dev-package": {
+        "type": "vcs",
+        "url": "https://github.com/marijanafilipovic/restpackage"
+    }
+}
+==================================
+2. composer require marijana/restpackage
 
 CONFIG
 endpoints se nalaze u config/endpoint.php
