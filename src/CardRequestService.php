@@ -5,14 +5,16 @@ namespace Marijana\Restpackage;
 
 
 use GuzzleHttp\Client;
-use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\RequestException;
 
 class CardRequestService extends validateRequest implements IRequestService
 {
-    protected $modelName = 'card';
-    protected $client;
-    protected $url;
+    private $modelName = 'card';
+    private $client;
+    protected string $api_key;
+    protected string $method;
+    protected string $url;
+    protected mixed $param;
     public function validateRequest($modelName, $method, $endpointName, $param=null)
     {
         $requestCheck = new validateRequest();
@@ -21,26 +23,28 @@ class CardRequestService extends validateRequest implements IRequestService
 
     public function makeRequest($method, $url, $param=null)
     {
-        //check response
         try{
                 $client = new Client();
                 $api_key = config('auth_app.AUTH-KEY');
-                // dd($api_key);
                 $headers = [
                     'AUTH-KEY' => $api_key
                 ];
-                //$params = [];
              $response = $client->request($method, $url, [
-                    //'json' => $params,
+                    'json' => $param,
                     'headers' => $headers,
                     'verify'=>false,
                 ]);
-                 $responseBody = json_decode($response->getBody());
-                return compact('responseBody');
-            }catch(ClientException $ex){
-           // return $responseBody = $ex->getResponse()->getBody(true);
-                 return "TRY block did not make response ";
-            }
+            $responseBody = json_decode($response->getBody());
+            return compact('responseBody');
+            }catch(RequestException $ex){
+              if($ex->hasResponse()){
+                  if($ex->getResponse()->getStatusCode()){
+                      echo "Got response code" . $ex->getResponse()->getStatusCode();
+                  }
+              }else{
+                  throw new \Exception("Request malformd." .$ex->getMessage());
+              }
         }
 
+    }
 }

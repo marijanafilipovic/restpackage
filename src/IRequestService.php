@@ -6,6 +6,6 @@ namespace Marijana\Restpackage;
 
 interface IRequestService
 {
-public function makeRequest($method, $url, $param);
-public function validateRequest($method, $endpointName, $param);
+public function makeRequest(string $method, string $url, mixed $param);
+public function validateRequest(string $modelName, string $method, string $endpointName, mixed $param);
 }

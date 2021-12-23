@@ -5,19 +5,18 @@ namespace Marijana\Restpackage;
 
 
 use GuzzleHttp\Client;
-use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\RequestException;
-use phpDocumentor\Reflection\Types\Null_;
 
 
 class CountryRequestService extends validateRequest implements IRequestService
 {
-protected $client;
-protected $api_key;
-protected $method;
-protected $url;
-protected $param;
-protected $modelName = 'country';
+    private $modelName = 'country';
+    private $client;
+    protected string $api_key;
+    protected string $method;
+    protected string $url;
+    protected mixed $param;
+
 //check endpoint from confing by endpointName and create endpointUrl
 
     /**
@@ -42,34 +41,28 @@ protected $modelName = 'country';
      */
     public function makeRequest($method, $url, $param=null)
     {
-     //check response
-
-        $client = new Client();
-        $api_key = config('auth_app.AUTH-KEY');
-        $headers = [
-            'AUTH-KEY' => $api_key
-        ];
-        //$params = [];
-        $response = $client->request($method, $this->url, [
-            //'json' => $params,
-            'headers' => $headers,
-            'verify'=>false,
-        ]);
-        if(!$response){
-            return "Bad request response.";
+         try{
+            $client = new Client();
+            $api_key = config('auth_app.AUTH-KEY');
+            $headers = [
+                'AUTH-KEY' => $api_key
+            ];
+            $response = $client->request($method, $url, [
+                'json' => $param,
+                'headers' => $headers,
+                'verify'=>false,
+            ]);
+            $responseBody = json_decode($response->getBody());
+            return compact('responseBody');
+            }catch(RequestException $ex){
+                if($ex->hasResponse()){
+                    if($ex->getResponse()->getStatusCode()){
+                        echo "Got response code" . $ex->getResponse()->getStatusCode();
+                    }
+                }else{
+                    throw new \Exception("Request malformd." .$ex->getMessage());
+                }
         }
-        try{
-        $responseBody = json_decode($response->getBody());
-        $response->getStatusCode();
-
-
-               return compact('responseBody');
-           }catch(ClientException $e){
-        return $response->getStatusCode();
-            //  redirect('/');
-
-        }
-
-}
+    }
 
 }

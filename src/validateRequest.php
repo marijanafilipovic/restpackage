@@ -6,10 +6,10 @@ namespace Marijana\Restpackage;
 
 class validateRequest
 {
-    protected $api_key;
-    protected $method;
-    protected $url;
-    protected $param;
+    protected string $api_key;
+    protected string $method;
+    protected string $url;
+    protected mixed $param;
 
     /**
      * @param $modelName
@@ -67,7 +67,7 @@ class validateRequest
         $point = config('endpoints.'.$modelName.'.'.$method .'.'.$endpointName.'');
 
        if(!$point){
-          return  "Bad method or endpointName";
+          return  "Bad method or modelName for endpoint Name.";
        }else{
           return $point;
        }
