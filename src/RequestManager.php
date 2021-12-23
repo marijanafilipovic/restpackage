@@ -24,7 +24,8 @@ class RequestManager
         }
         $createMethod = 'create'.ucfirst($name).'RequestService';
         if(!method_exists($this, $createMethod)){
-            throw new \Exception("Request is not supported.");
+            throw new \Exception("Request is not supported from RequestManager.");
+
         }
         $service = $this->{$createMethod}();
         $this->modelName[$name] = $service;

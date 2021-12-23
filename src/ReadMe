@@ -3,21 +3,9 @@ INSTALL
 za preuzimanje preko composer-a
 1. u composer.json aplikacije dodati
 ==================================
-    "repositories": {
-        "dev-package": {
-            "type": "vcs",
-            "url": "https://github.com/marijanafilipovic/restpackage"
-        }
-    },
-==================================
-2. composer require marijana/restpackage
-
 
 CONFIG
 endpoints se nalaze u config/endpoint.php
-/** treba bi ih razdvojiti po modelu
-
-
 
 API_KEY
 se nalazi u fajlu config/auth_app.php
@@ -27,27 +15,21 @@ koriscenje high level klase npr. u controller-u
 
 use Marijana\Restpackage\IRequestManager;
 
-parameti
-$modelName= 'a list of the available countries';
-$method = '';
-$endpointName = '';
-$param = ':id';
+@params
+    $modelName= 'country';
+    $method = 'get';
+    $endpointName = 'a list of the available countries';
+    $param = '1';
 
  $factory = app(IRequestManager::class);
         $service = $factory->make($modelName);
-        $response = $service->makeRequest($method, $endpointName, $param);
+        $url = $srvice->validate($modelName, mathod, $endpointName);
+        $response = $service->makeRequest($method, $url, $param);
 
     return $response;
 
-POSEBNO NE/POTREBNO
-Kao prvo deo url-a endpointa uzima se
+POSEBNO ZA CONFIG
+Za prvi deo url-a endpointa uzima se
 APP_URL konstanta env. fajl-a u kom se nalazi projekat
 za drugi deo url-a se uzima iz config/endpoints.php
-
-OSTAJE RAZRADITI
-Razdvojiti kod iz makeRequest sa validateRequest
-
-Exception handling
-  request
-  response
 

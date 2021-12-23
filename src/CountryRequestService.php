@@ -5,54 +5,64 @@ namespace Marijana\Restpackage;
 
 
 use GuzzleHttp\Client;
-use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\RequestException;
-use phpDocumentor\Reflection\Types\Null_;
 
 
-class CountryRequestService implements IRequestService
+class CountryRequestService extends validateRequest implements IRequestService
 {
-protected $client;
-public function makeRequest($method, $endpointName, $param)
-{
-    //check endpoint from confing by endpointName and create endpointUrl
+    private $modelName = 'country';
+    private $client;
+    protected string $api_key;
+    protected string $method;
+    protected string $url;
+    protected mixed $param;
 
-    if($endpointName == ''){
-        $url='https://restcountries.com/v2/all';
-    }else{
-        $endUrl = config('endpoints.'.$endpointName);
-        //  dd($endUrl);
+//check endpoint from confing by endpointName and create endpointUrl
 
-        // $param = 150;
-        if(strpos($endUrl, ':id') !==false && (!empty($param))){
-            $endUrl = str_replace(':id', $param,$endUrl);
-        }
-        $baseURL = env('APP_URL');
-        $url = $baseURL.$endUrl;
-        //dd($url);
+    /**
+     * @param $modelName
+     * @param $method
+     * @param $endpointName
+     * @param null $param
+     * @return string
+     */
+    public function validateRequest($modelName, $method, $endpointName, $param=null)
+    {
+        $requestCheck = new validateRequest();
+        return $this->url = $requestCheck->validate($modelName, $method, $endpointName, $param);
     }
-    //check response
-    try{
-        $client = new Client();
-        $api_key = config('auth_app.AUTH-KEY');
-        // dd($api_key);
-        $headers = [
-            'AUTH-KEY' => $api_key
-        ];
-        //$params = [];
-        $response = $client->request($method, $url, [
-            //'json' => $params,
-            'headers' => $headers,
-            'verify'=>false,
-        ]);
-        if(!$response){
-            return "Bad request response.";
+
+    /**
+     * @param $method
+     * @param $url
+     * @param null $param
+     * @return array|string
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public function makeRequest($method, $url, $param=null)
+    {
+         try{
+            $client = new Client();
+            $api_key = config('auth_app.AUTH-KEY');
+            $headers = [
+                'AUTH-KEY' => $api_key
+            ];
+            $response = $client->request($method, $url, [
+                'json' => $param,
+                'headers' => $headers,
+                'verify'=>false,
+            ]);
+            $responseBody = json_decode($response->getBody());
+            return compact('responseBody');
+            }catch(RequestException $ex){
+                if($ex->hasResponse()){
+                    if($ex->getResponse()->getStatusCode()){
+                        echo "Got response code" . $ex->getResponse()->getStatusCode();
+                    }
+                }else{
+                    throw new \Exception("Request malformd." .$ex->getMessage());
+                }
         }
-        $responseBody = json_decode($response->getBody());
-        return compact('responseBody');
-    }catch(ClientException $ex){
-        dd($ex->getMessage());
     }
-}
 
 }
